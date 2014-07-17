@@ -1,0 +1,210 @@
+$def with (persisted, timestamp)
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+  <html>
+  <head>
+    <meta charset="utf-8"/>
+
+<style>
+body {font-family: Arial, Helvetica, sans-serif}
+.ui-rangeSlider .ui-ruler-scale0 .ui-ruler-tick-label {
+    font-size: 10px;
+}
+.ui-rangeSlider-container { width: 1000px; }
+.ui-rangeSlider-innerBar {width: 1000px;}
+.timeSlider {
+/*      height: 45px; */
+        width:100%;
+}
+.sliderContainer { padding:20px;}
+</style>
+
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="icon" type="image/png" href="/static/images/favicon.ico">
+  <title>iSPRESSO Schedule</title>
+  
+  <link rel="stylesheet" href="/static/jquery.mobile-1.3.2.min.css">
+  
+  <!-- Extra Codiqa features -->
+  <!--link rel="stylesheet" href="/static/codiqa.ext.css"-->
+  
+  <!-- jQuery and jQuery Mobile -->
+  <script src="/static/jquery-1.9.1.min.js"></script>
+  <script src="/static/jquery.mobile-1.3.2.min.js"></script>
+
+  <!-- Extra Codiqa features -->
+  <!--script src="/static/codiqa.ext.js"></script-->
+
+    <link rel="stylesheet" href="/static/jQRangeSlider-5.1.1/css/iThing.css" type="text/css" />
+
+    <script src="/static/jQRangeSlider-5.1.1/lib/jquery-1.7.1.min.js"></script>
+    <script src="/static/jQRangeSlider-5.1.1/lib/jquery-ui-1.8.16.custom.min.js"></script>
+    <script src="/static/jQRangeSlider-5.1.1/jQDateRangeSlider-withRuler-min.js"></script>
+
+  </head>
+  <body>
+
+<div data-role="page" id="schedule" width="100%">
+
+    <div data-theme="a" data-role="header">
+        <div id="logo"><img src="/static/images/ispresso_logo.png" alt="iSPRESSO" align="center" /></div>
+        <div data-role="navbar" data-iconpos="top">
+            <ul>
+                <li>
+                    <a href="/" data-transition="fade" data-theme="" data-icon="" rel="external">
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a href="settings" data-transition="fade" data-theme="" data-icon="" rel="external">
+                        Settings
+                    </a>
+                </li>
+                <li>
+                    <a href="schedule" data-transition="fade" data-theme="" data-icon="" class="ui-btn-active ui-state-persist" rel="external">
+                        Schedule
+                    </a>
+                </li>
+                <li>
+                    <a href="advanced" data-transition="fade" data-theme="" data-icon="" rel="external">
+                        Advanced
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+<BR/>
+<div class="sliderContainer" >
+        <label for="sldrSunday">Sunday</label>
+        <div id="sldrSunday" class="timeSlider" style="width:100%;"></div>
+</div>  
+<br />
+<div class="sliderContainer">
+        <label for="sldrMonday">Monday</label>
+        <div id="sldrMonday" class="timeSlider" ></div>
+</div>
+<br />
+<div class="sliderContainer">
+        <label for="sldrTuesday">Tuesday</label>
+        <div id="sldrTuesday" class="timeSlider" ></div>
+</div>
+<br />
+<div class="sliderContainer">
+        <label for="sldrWednesday">Wednesday</label>
+        <div id="sldrWednesday" class="timeSlider" ></div>
+</div>
+<br />
+<div class="sliderContainer">
+        <label for="sldrThursday">Thursday</label>
+        <div id="sldrThursday" class="timeSlider" ></div>
+</div>
+<br />
+<div class="sliderContainer">
+        <label for="sldrFriday">Friday</label>
+        <div id="sldrFriday" class="timeSlider" ></div>
+</div>
+<br />
+<div class="sliderContainer">
+        <label for="sldrSaturday">Saturday</label>
+        <div id="sldrSaturday" class="timeSlider"  ></div>
+</div>
+<br /><br />&nbsp; Current Date and Time:  $timestamp
+<br /><br />
+
+<input type="hidden" id="txtDebug" name="txtDebug" />
+
+</div>
+<script>
+
+	jQuery(document).ready(function() {
+
+		jQuery("#logo img").css({ 'max-width' : jQuery(window).width() });
+		jQuery("#logo img").css({"height" : "auto"});
+
+        startTimeRange = new Date(2010, 0, 1, 0, 5);
+        endTimeRange = new Date(2010, 0, 1, 23, 55);
+
+        defaultStartTime = new Date(2010, 0, 1, 6, 0)
+        defaultEndTime = new Date(2010, 0, 1, 10, 30)
+
+        var ServerUrl = "/schedule";                      // populate sliders from server persisted values on page load
+
+        jQuery(".timeSlider").dateRangeSlider({
+                bounds : {
+                        min : startTimeRange,
+                        max : endTimeRange
+                },
+                arrows : false,
+                scales : [{
+                        first : function(value) {
+                                return value;
+                        },
+                        end : function(value) {
+                                return value;
+                        },
+                        next : function(value) {
+                                var next = new Date(value);
+                                return new Date(next.setHours(value.getHours() + 1));
+                        },
+                        label : function(value) {
+                                return value.getHours() + ":00";
+                        }
+                }],
+                formatter : function(value) {
+                        var hour = value.getHours(), minute = value.getMinutes();
+                        return "" + (hour) + ":" + (minute < 10 ? "0" + minute : minute);
+                },
+                step : {
+                        minutes : 5,
+                },
+        }).bind("userValuesChanged", function(e, data) {
+                var minHour = data.values.min.getHours(), 
+                        minMinutes = data.values.min.getMinutes(), 
+                        maxHour = data.values.max.getHours(), 
+                        maxMinutes = data.values.max.getMinutes(),
+                        finalMin = "" + (minHour) + ":" + (minMinutes < 10 ? "0" + minMinutes : minMinutes), 
+                        finalMax = "" + (maxHour) + ":" + (maxMinutes < 10 ? "0" + maxMinutes : maxMinutes);
+                var myDay = {};
+                var myTime = {};
+                myDay['day'] = this.id.substring(4);                            // what day are we dealing with
+                myTime['startTime'] = finalMin;
+                myTime['endTime'] = finalMax;
+                myDay['time'] = myTime;
+
+                jQuery.ajax({
+                        url : ServerUrl,
+                        type : "POST",
+                        contentType: 'application/json',
+                        dataType : 'json',
+                        data : JSON.stringify(myDay),
+                        success : function(response) {
+                                var ajaxResponse = JSON.stringify(response);
+//                                jQuery("#txtDebug").val(ajaxResponse);
+//                              alert(ajaxResponse);
+                        },
+                        error: function (request, status, error) {
+                                var ajaxResponse = JSON.stringify(request);
+//	                        jQuery("#txtDebug").val(request.responseText);
+							alert(error + " = " + ajaxResponse);
+                        }
+
+                });
+
+        }).width("100%");
+        
+		var myJson = $:persisted;
+		
+		jQuery.each(myJson.days, function(id, days) {
+//			alert('day = ' + days.day + ' and time = ' + days.time.startTime);
+			jQuery("#sldr" + days.day).dateRangeSlider("min", new Date(2010, 0, 1, days.time.startTime.split(":")[0], days.time.startTime.split(":")[1] ) );
+			jQuery("#sldr" + days.day).dateRangeSlider("max", new Date(2010, 0, 1, days.time.endTime.split(":")[0], days.time.endTime.split(":")[1] ) );
+		});
+
+});
+
+</script>
+  </body>
+</html>

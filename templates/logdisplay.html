@@ -1,0 +1,27 @@
+$def with(content)
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/string;charset=utf-8" >
+    <title>iSPRESSO:  Log Display</title>
+
+  <script src="/static/jquery-1.9.1.min.js"></script>
+
+	<script type="text/javascript" >
+		jQuery(document).ready(function() {
+			jQuery("#logo img").css({ 'max-width' : jQuery(window).width() });
+			jQuery("#logo img").css({"height" : "auto"});
+		});
+	</script>
+</head>
+<body>
+    <div id="logo"><img src="/static/images/ispresso_logo.png" alt="iSPRESSO" align="center" /></div>
+
+    <form name="file_content" id="file_content" methode="GET">
+        <pre>
+	        <p> $content</p>
+        </pre>
+    </form>
+</body>
+<html>
+
+

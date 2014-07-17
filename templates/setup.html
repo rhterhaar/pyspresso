@@ -1,0 +1,114 @@
+$def with (persisted)
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>iSPRESSO SETUP</title>
+  
+  <link rel="stylesheet" href="/static/jquery.mobile-1.3.2.min.css">
+  
+  <!-- Extra Codiqa features -->
+  <!--link rel="stylesheet" href="/static/codiqa.ext.css"-->
+  
+  <!-- jQuery and jQuery Mobile -->
+  <script src="/static/jquery-1.9.1.min.js"></script>
+  <script src="/static/jquery.mobile-1.3.2.min.js"></script>
+
+  <!-- Extra Codiqa features -->
+  <!--script src="/static/codiqa.ext.js"></script-->
+
+	<script type="text/javascript" >
+
+	jQuery(document).ready(function() {
+
+		jQuery("#logo img").css({ 'max-width' : jQuery(window).width() });
+		jQuery("#logo img").css({"height" : "auto"});
+
+		var myVar = $:persisted;
+		myThing = "<ul>";
+		
+		jQuery(myVar).each(function (index) {
+			myThing += "<li><a href=# class=myEssid >" + myVar[index] + "</a></li>";
+		});
+		myThing += "</ul>";
+
+		jQuery("#networklist").html(myThing);	// the ESSID field is left open intentionally in case it's an unpublished network
+		
+		jQuery(".myEssid").click( function (id) {
+			jQuery("#ssid").val(jQuery(this).html());
+			
+		});
+		
+		jQuery("#divSubmitted").hide();
+
+		jQuery("#btnSubmit").click(function() { 
+			
+			var ssid = jQuery("#ssid").val() ;
+			var passwd  = jQuery("#passwd").val();				
+
+			jQuery("#divSubmitted").show();
+			jQuery("#form1").hide();
+
+			jQuery.ajax (
+			{ 
+				url : "/setup", 		// ispresso module is called when / is requested
+				type: "post",
+				data : { "ssid" : ssid , "passwd" : passwd },	
+				complete : function (xhr, result)
+				{
+				    if (result != "success") return;
+					var response = xhr.responseText;
+					alert(response);
+				}
+	   		});   
+
+		});
+
+	});
+	</script>   
+</head>
+<body>
+<!-- Home -->
+<div data-role="page" id="page1">
+    <div data-theme="a" data-role="header">
+        <div id="logo"><img src="/static/images/ispresso_logo.png" alt="iSPRESSO" align="center" /></div>
+        
+    </div>
+ 
+ 	<form name=form1 id=form1 action="/setup" method="post" >
+	
+	<table width="50%" align=center>
+		<tr><td colspan=2><BR><BR><B>Welcome to iSPRESSO Setup!  </B><BR><BR>Your iSPRESSO is not yet configured to use a WIFI access point.  
+	For best results, put in your Wifi information below and iSPRESSO will attempt to join the network. <BR><BR>
+	Alternatively, you can still continue to use the device while connected to "ispresso" network using iSPRESSO <a href="/">main page</a>. 
+	
+	<BR><BR>
+		Found networks:<br>    <div id="networklist" name="networklist" ></div>
+
+	</td></tr>
+	
+		<tr>
+			<td align=right>SSID:  </td>
+			<td> <input type=text name=ssid id=ssid></td>
+		</tr>
+		<tr>
+			<td align=right>Password (WPA-PSK):  </td>
+			<td><input type=password name=passwd id=passwd></td>
+		</tr>
+		<tr><td colspan=2> <input type=button name=btnSubmit id=btnSubmit value=Submit></td></tr>
+	</table>
+	
+ 	</form>
+
+	<div name=divSubmitted id=divSubmitted ><table width="50%" align="center"><tr><td>
+		<BR><BR><B>Thanks!</B><BR><BR> Your iSPRESSO is now reconfiguring itself to join your network, and it will only 
+		re-activate the "ispresso" wifi network if it has trouble getting on the network you specified. <BR><BR> Please drop off of "ispresso" wifi network and re-join
+		your primary wifi / internet access point, and you will be ready to use iSPRESSO!
+	</td></tr></table> </div>
+
+</div>
+</body>
+</html>

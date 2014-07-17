@@ -1,0 +1,133 @@
+$def with (persisted)
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>iSPRESSO Settings</title>
+  
+  <link rel="stylesheet" href="/static/jquery.mobile-1.3.2.min.css">
+  
+  <!-- Extra Codiqa features -->
+  <!--link rel="stylesheet" href="/static/codiqa.ext.css"-->
+  
+  <!-- jQuery and jQuery Mobile -->
+  <script src="/static/jquery-1.9.1.min.js"></script>
+  <script src="/static/jquery.mobile-1.3.2.min.js"></script>
+
+  <!-- Extra Codiqa features -->
+  <!--script src="/static/codiqa.ext.js"></script-->
+
+</head>
+<body>
+<!-- Home -->
+<div data-role="page" id="page1">
+    <div data-theme="a" data-role="header">
+        <div id="logo"><img src="/static/images/ispresso_logo.png" alt="iSPRESSO" align="center" /></div>
+        <div data-role="navbar" data-iconpos="top">
+            <ul>
+                <li>
+                    <a href="/" data-transition="fade" data-theme="" data-icon=""  rel="external">
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a href="settings" data-transition="fade" data-theme="" data-icon="" class="ui-btn-active ui-state-persist" rel="external">
+                        Settings
+                    </a>
+                </li>
+                <li>
+                    <a href="schedule" data-transition="fade" data-theme="" data-icon="" rel="external">
+                        Schedule
+                    </a>
+                </li>
+                <li>
+                    <a href="advanced" data-transition="fade" data-theme="" data-icon="" rel="external">
+                        Advanced
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div data-role="content">
+        <div data-role="fieldcontain">
+            <label for="temp">
+                Target Temperature (F)
+            </label>
+            <input id="temp" name="temp" value="0" min="100" max="250" data-highlight="false" class="mySlider"
+
+            type="range">
+        </div>
+        <div data-role="fieldcontain">
+            <label for="soakSecs">
+                Presoak Time (sec)
+            </label>
+            <input id="soakSecs" name="soakSecs" value="0" min="0" max="10" data-highlight="false" class="mySlider"
+            type="range">
+        </div>
+        <div data-role="fieldcontain">
+            <label for="waitSecs">
+                Wait Time (sec)
+            </label>
+            <input id="waitSecs" name="waitSecs" value="0" min="0" max="10" data-highlight="false" class="mySlider"
+
+            type="range">
+        </div>
+        <div data-role="fieldcontain">
+            <label for="brewSecs">
+                Brew Time (sec)
+            </label>
+            <input id="brewSecs" name="brewSecs" value="0" min="0" max="50" data-highlight="false" class="mySlider"
+
+            type="range">
+        </div>
+    </div>
+</div>
+
+<script>
+
+	 jQuery(document).ready(function() {
+
+		jQuery("#logo img").css({ 'max-width' : jQuery(window).width() });
+		jQuery("#logo img").css({"height" : "auto"});
+
+		var myJson = $:persisted;
+		var ServerUrl = "/settings";
+		
+		jQuery.each(myJson, function(id, value) {
+			jQuery("#" + id).val(value).slider("refresh");			//			alert('id =' + id + ' and value = ' + value);
+		});
+
+		jQuery(".mySlider").on("slidestop", function() { 
+			var myId = jQuery(this).attr("id");
+			var myVal = jQuery(this).val();			//			alert('you changed ' + myId + ' to value ' + myVal); 
+			
+			var mySetting = {};
+			mySetting[myId] = myVal;
+			
+            jQuery.ajax({
+                    url : ServerUrl,
+                    type : "POST",
+                    contentType: 'application/json',
+                    dataType : 'json',
+                    data : JSON.stringify(mySetting),
+                    success : function(response) {
+                        var ajaxResponse = JSON.stringify(response);
+//                              alert(ajaxResponse);
+                    },
+                    error: function (request, status, error) {
+	                    jQuery("#txtDebug").val(request.responseText);
+                    }
+
+            });
+
+		});
+
+	});
+
+</script>
+
+</body>
+</html>
